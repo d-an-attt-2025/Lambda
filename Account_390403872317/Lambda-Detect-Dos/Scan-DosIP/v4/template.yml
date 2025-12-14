@@ -1,0 +1,76 @@
+# This AWS SAM template has been generated from your function's configuration. If
+# your function has one or more triggers, note that the AWS resources associated
+# with these triggers aren't fully specified in this template and include
+# placeholder values. Open this template in AWS Infrastructure Composer or your
+# favorite IDE and modify it to specify a serverless application with other AWS
+# resources.
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Application Model template describing your function.
+Resources:
+  mlsalambdascandosipapsoutheast1:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Description: ''
+      MemorySize: 1024
+      Timeout: 120
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      Environment:
+        Variables:
+          ADMIN_EMAIL: vietdqhe176173@fpt.edu.vn
+          BLOCK_URL: >-
+            https://yzqcjrqf54iqjszokflh2mlray0mtrcc.lambda-url.ap-southeast-1.on.aws/
+          DDB_TABLE: mlsa-ddbt-ip-rate-ap-southeast-1
+          THRESHOLD: '100'
+          TTL_COUNTER: '300'
+          TTL_EMAIL: '360'
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      PackageType: Zip
+      Policies:
+        - Statement:
+            - Sid: DynamoDBCounterAndEmailLock
+              Effect: Allow
+              Action:
+                - dynamodb:UpdateItem
+                - dynamodb:PutItem
+              Resource: >-
+                arn:aws:dynamodb:ap-southeast-1:390403872317:table/mlsa-ddbt-ip-rate-ap-southeast-1
+            - Sid: CloudWatchLogsWrite
+              Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource:
+                - arn:aws:logs:ap-southeast-1:390403872317:*
+                - >-
+                  arn:aws:logs:ap-southeast-1:390403872317:log-group:/aws/lambda/mlsa-lambda-scan-dos-ip-ap-southeast-1:*
+            - Sid: SendAlertEmail
+              Effect: Allow
+              Action:
+                - ses:SendEmail
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+              Resource: arn:aws:logs:ap-southeast-1:390403872317:*
+            - Effect: Allow
+              Action:
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource:
+                - >-
+                  arn:aws:logs:ap-southeast-1:390403872317:log-group:/aws/lambda/mlsa-lambda-scan-dos-ip-ap-southeast-1:*
+      RecursiveLoop: Terminate
+      SnapStart:
+        ApplyOn: None
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
